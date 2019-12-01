@@ -1,4 +1,20 @@
 #include <ESP8266WiFi.h>
+#include <EspMQTTClient.h>
+
+#include "cat-litter-sensor.h"
+
+EspMQTTClient mqttclient(
+  WIFI_SSID,
+  WIFI_PASS,
+  MQTT_IP,
+  MQTT_USER,
+  MQTT_PASS,
+  "cat-litter"
+);
+
+void onConnectionEstablished() {
+  Serial.println("MQTT connection!");
+}
 
 #define DISTANCE_TRIG 13
 #define DISTANCE_ECHO 12
@@ -55,6 +71,10 @@ bool is_cat_detected() {
 void send_report() {
   Serial.println("sending report!");
   delay(500);
+  if (mqttclient.isConnected()) {
+    Serial.println("connected, publishing");
+    mqttclient.publish("channel/test", "This is a message from ESP");
+  }
 }
 
 void deep_sleep(unsigned int duration_s) {
@@ -68,12 +88,19 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   distance_setup();
 
+//  if (is_cat_detected()) {
+//    send_report();
+//  }
+//
+//  deep_sleep(30);
+}
+
+void loop() {
+  mqttclient.loop();
+
   if (is_cat_detected()) {
     send_report();
   }
 
-  deep_sleep(15);
-}
-
-void loop() {
+  delay(5000);
 }
