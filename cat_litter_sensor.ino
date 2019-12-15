@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <EspMQTTClient.h>
 
-#include "cat-litter-sensor.h"
+#include "cat_litter_sensor.h"
 
 EspMQTTClient mqttclient(
   WIFI_SSID,
